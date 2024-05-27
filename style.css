@@ -38,6 +38,9 @@ li {
     color: white;
 }
 
+li.long {
+   width: 172.5px;
+}
 #keyboard li:hover {  
     position: relative;  
     top: 1px;  
