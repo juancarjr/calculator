@@ -1,61 +1,71 @@
-inputs = []
+let firstNum = ''
+let secondNum = ''
+let firstOperator = ''
+let secondOperator = ''
+let trigger = false
 
-var operators = {
+var op = {
     '+': function(a, b) { return a + b },
     '-': function(a, b) { return a - b },
     '*': function(a, b) { return a * b },
     '/': function(a, b) { return a / b },
 };
 
-function separator(e) {
-    switch (e.target.classList[0]) { 
-        case 'num':
-            if (inputs[0] == '=') {
-                inputs.pop()
-                display.textContent = ''
-            }
-            num = display.textContent + e.target.textContent
-            display.textContent = num
-            break
-        case 'operator':
-            operation = e.target.textContent
-            display.textContent = operation
-            checker(+num)
-            checker(operation)
-            break
-}}
-
-function checker(term) { // needs two arguments
-    console.log('Term:', term, 'Term is numeric?', Number.isInteger(term))
-    if (Number.isInteger(term) && inputs.length == 0) { // first term, has to be numeric
-        inputs.push(term)
-    } else if (Number.isInteger(term) && !(Number.isInteger(inputs[inputs.length - 1]))) { // last term operator, current numeric
-        inputs.push(term)
-    } else if (!(Number.isInteger(term)) && Number.isInteger(inputs[inputs.length - 1])) { // last term numeric, current operator
-        console.log(inputs)
-
-        if (term == '=' && inputs.length == 3) {
-            try {display.textContent = operators[inputs[1]](inputs[0], inputs[2])
-            inputs = []
-        } catch {
-            console.log('ERROR', inputs)
-        };
-        }
-        inputs.push(term)
-    }
+function displayKey(e) {
+    display.textContent += e.target.innerText
+    resultString(e.target.innerText)
 }
 
-function operate(e) {
-    if (inputs.length < 3) {
-        separator(e)
-        console.log(inputs)
+function getOperator(e) {
+    if (firstOperator) {
+        secondOperator = e.target.innerText
+        secondNum = display.textContent
+        operate()
+    } else firstNum = display.textContent
+    currentOperator = e.target.innerText
+    resultString(currentOperator)
+    firstOperator = currentOperator
+    clearDisplay()
+
+}
+
+function resultString(input) {
+    if (trigger) {
+        clearResultDisplay()
+        resultDisplay.textContent = input
+        trigger = false
     } else {
-        inputs = []
+    resultDisplay.textContent += input
     }
 }
 
+function clearDisplay() {
+    display.textContent = ''
+}
 
+function clearResultDisplay() {
+    resultDisplay.textContent = ''
+}
 
-display = document.querySelector('#display')
-keys = document.querySelectorAll('li')
-keys.forEach(key => {key.addEventListener('click', operate)});
+function operate() {
+    console.log(firstNum, firstOperator, secondNum, secondOperator)
+    results = op[firstOperator](+firstNum, +secondNum)
+    console.log(results)
+    firstNum = results
+    display.textContent = results
+    trigger = true
+    resultString(results)
+}
+
+function reset() {
+    firstNum = ''
+    firstOperator = ''
+    secondOperator = ''
+}
+
+const operators = document.querySelectorAll('.operator')
+const keys = document.querySelectorAll('.num')
+const display = document.querySelector('#display')
+const resultDisplay = document.querySelector('#header')
+keys.forEach(key => {key.addEventListener('click', displayKey)});
+operators.forEach(key => {key.addEventListener('click', getOperator)});
